@@ -18,11 +18,19 @@ def send_message():
     if entry.get():
         message_col.insert_one({"text": entry.get()})
         entry.delete(0, tk.END)
+        fetch_messages()
+        
 
 send_button = tk.Button(root, text="Send", command=send_message)
 send_button.pack(pady=5)
 
-messages_label = tk.Label(root, text="Messages:\n", justify="left") 
+messages_label = tk.Label(root, text="Messages:\n") 
 messages_label.pack()
 
+def fetch_messages():
+    messages = message_col.find().sort("_id", -1)
+    messages_label.config(text="Messages:\n" + "\n".join(f"-{m['text']}"for m in messages))
+    root.after(2000, fetch_messages)
+
+fetch_messages()
 root.mainloop()
